@@ -54,9 +54,9 @@ exports.getOrders = functions.https.onCall( async (data, context) => {
         orders.push({...doc.data(), orderID: doc.id});
       });
     })
-    .catch(function(error)){
+    .catch(function(error) {
       console.log("Error in getOrders: ", error);
-    }
+    });
 
   orders.forEach((order, index) => {
     orders.completed ? completedOrders.push(order) : pendingOrders.push(order);
