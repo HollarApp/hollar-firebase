@@ -35,3 +35,39 @@ exports.getStoreFrontMenu = functions.https.onCall( async (data, context) => {
 
     return returnData;
 });
+
+exports.getOrders = functions.https.onCall( async (data, context) => {
+  // fetch order data
+  storeId = data.storeId;
+
+  const db = admin.firestore()
+  const ordersRef = await db.collection('order');
+
+  var orders = [];
+  var completedOrders = [];
+  var pendingOrders = [];
+
+  ordersRef.where("storeID", "==", storeID)
+    .get()
+    .then(function(querySnapshot) {
+      querySnapshot.forEach(function(doc){
+        orders.push(doc.data());
+      });
+    })
+    .catch(function(error)){
+      console.log("Error in getOrders: ", error);
+    }
+
+  orders.forEach((order, index) => {
+    orders.completed ? completedOrders.push(order) : pendingOrders.push(order);
+  });
+
+  const returnData = {
+    "completedOrders": completedOrders, 
+    "pendingOrders": pendingOrders
+  }
+
+  //console.log(returnData)
+
+  return returnData;
+});
