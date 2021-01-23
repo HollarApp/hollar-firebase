@@ -27,7 +27,9 @@ exports.getStoreFrontMenu = functions.https.onCall( async (data, context) => {
     const storeRef = await db.collection("store").doc(storeId).get()
     const storeData = storeRef.data()
 
-    const returnData = {...storeData, ...receivedData}
+    const returnData = {...storeData, 
+        "sections": Object.values(receivedData)
+    }
     
     //console.log(returnData)
 
