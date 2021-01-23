@@ -11,19 +11,15 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 });
 
 
-exports.getStoreFrontMenu = functions.https.onRequest(async (req, res) => {
-    if (req.method !== "POST") {
-        res.send("Can only post to this method");
-    }
-
+exports.getStoreFrontMenu = functions.https.onCall( async (data, context) => {
     // fetch menu data
-    storeId = req.body.storeId;
+    storeId = data.storeId;
     
     const db = admin.firestore()
     const sectionRef = await db.collection('menu').doc(storeId).collection("sections").get();
 
     const receivedData = sectionRef.docs.map((value, index, arr) => {
-        console.log(value.data())
+        //console.log(value.data())
         return value.data()
     })
 
@@ -33,7 +29,7 @@ exports.getStoreFrontMenu = functions.https.onRequest(async (req, res) => {
 
     const returnData = {...storeData, ...receivedData}
     
-    console.log(returnData)
+    //console.log(returnData)
 
-    res.json(returnData);
+    return returnData;
 });
