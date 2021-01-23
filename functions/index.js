@@ -49,7 +49,7 @@ exports.getOrders = functions.https.onCall( async (data, context) => {
     .get()
     .then(function(querySnapshot) {
       querySnapshot.forEach(function(doc){
-        orders.push(doc.data());
+        orders.push({...doc.data(), orderID: doc.id});
       });
     })
     .catch(function(error)){
