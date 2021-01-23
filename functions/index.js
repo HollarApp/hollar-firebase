@@ -40,6 +40,8 @@ exports.getOrders = functions.https.onCall( async (data, context) => {
   // fetch order data
   storeId = data.storeId;
 
+  // console.log("storeID: " + storeId);
+
   const db = admin.firestore();
   const ordersRef = await db.collection('order');
 
@@ -47,7 +49,7 @@ exports.getOrders = functions.https.onCall( async (data, context) => {
   var completedOrders = [];
   var pendingOrders = [];
 
-  ordersRef.where("storeID", "==", storeID)
+  ordersRef.where("storeID", "==", storeId)
     .get()
     .then(function(querySnapshot) {
       querySnapshot.forEach(function(doc){
@@ -57,6 +59,8 @@ exports.getOrders = functions.https.onCall( async (data, context) => {
     .catch(function(error) {
       console.log("Error in getOrders: ", error);
     });
+
+  // console.log("orders: ", orders);
 
   orders.forEach((order, index) => {
     orders.completed ? completedOrders.push(order) : pendingOrders.push(order);
