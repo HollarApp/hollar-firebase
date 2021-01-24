@@ -40,40 +40,42 @@ exports.getOrders = functions.https.onCall( async (data, context) => {
   // fetch order data
   storeId = data.storeId;
 
-  // console.log("storeID: " + storeId);
-
-  const db = admin.firestore();
-  const ordersRef = await db.collection('order');
-
+  console.log("storeID: " + storeId);
   var orders = [];
   var completedOrders = [];
   var pendingOrders = [];
 
-  ordersRef.where("storeID", "==", storeId)
+  const db = admin.firestore();
+  const ordersRef = db.collection('order').where("storeID", "==", storeId)
     .get()
     .then(function(querySnapshot) {
       querySnapshot.forEach(function(doc){
-        orders.push({...doc.data(), orderID: doc.id});
+        console.log(JSON.stringify(doc));
+        var tempOrder = {...doc.data()};
+        tempOrder["orderID"] = doc.id;
+        orders.push(tempOrder);
+        console.log("orders: ", orders);
       });
+      orders.forEach((order, index) => {
+        orders.completed ? completedOrders.push(order) : pendingOrders.push(order);
+      });
+
+      const returnData = {
+        "completedOrders": completedOrders, 
+        "pendingOrders": pendingOrders, 
+        "orders": orders
+      }
+      return returnData;
     })
     .catch(function(error) {
       console.log("Error in getOrders: ", error);
+      return returnData = {
+        "completedOrders": [], 
+        "pendingOrders": [], 
+        "orders": "error"
+      }
     });
 
-  // console.log("orders: ", orders);
-
-  orders.forEach((order, index) => {
-    orders.completed ? completedOrders.push(order) : pendingOrders.push(order);
-  });
-
-  const returnData = {
-    "completedOrders": completedOrders, 
-    "pendingOrders": pendingOrders
-  }
-
-  //console.log(returnData)
-
-  return returnData;
 });
 
 exports.completeOrder = functions.https.onCall( async (data, context) => {
